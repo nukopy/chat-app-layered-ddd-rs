@@ -26,3 +26,6 @@ tokio-tungstenite = "0.28.0"
 tower-http = { version = "0.6.6", features = ["trace"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["fmt", "ansi", "env-filter"] }
+
+[dev-dependencies]
+mockall = "0.13"
