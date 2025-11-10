@@ -1,0 +1,19 @@
+[package]
+name = "chat-app-rs"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+axum = { version = "0.8.6", features = ["macros", "ws"] }
+chrono = "0.4"
+clap = { version = "4.5", features = ["derive"] }
+futures-util = "0.3.31"
+rustyline = "14.0"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0"
+serialport = "4.8.1"
+tokio = { version = "1.48.0", features = ["full"] }
+tokio-tungstenite = "0.28.0"
+tower-http = { version = "0.6.6", features = ["trace"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["fmt", "ansi", "env-filter"] }
