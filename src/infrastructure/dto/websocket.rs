@@ -1,4 +1,4 @@
-//! Shared type definitions for WebSocket chat application.
+//! WebSocket message DTOs for the chat application.
 
 use serde::{Deserialize, Serialize};
 

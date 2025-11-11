@@ -4,11 +4,12 @@
 //! chat application with broadcast functionality.
 
 pub mod client;
+pub mod domain;
 pub mod error;
+pub mod infrastructure;
 pub mod logger;
 pub mod server;
 pub mod time;
-pub mod types;
 
 // Re-export entry points
 pub use client::run_client;
