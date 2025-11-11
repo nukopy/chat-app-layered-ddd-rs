@@ -20,9 +20,17 @@ use crate::{
         ChatMessage, MessageType, ParticipantJoinedMessage, ParticipantLeftMessage,
         RoomConnectedMessage,
     },
-    ui::state::{AppState, ConnectQuery},
+    ui::state::AppState,
     usecase::{ConnectParticipantUseCase, DisconnectParticipantUseCase, SendMessageUseCase},
 };
+
+use serde::Deserialize;
+
+/// Query parameters for WebSocket connection
+#[derive(Debug, Deserialize)]
+pub struct ConnectQuery {
+    pub client_id: String,
+}
 
 pub async fn websocket_handler(
     ws: WebSocketUpgrade,
@@ -95,16 +103,16 @@ async fn handle_socket(
         tracing::info!("Sent room connected list to '{}'", client_id);
 
         // Get this client's connected_at timestamp for broadcasting
-        let clients = state.connected_clients.lock().await;
-        clients
-            .get(&client_id)
-            .map(|info| info.connected_at)
+        state
+            .repository
+            .get_client_connected_at(&client_id)
+            .await
             .unwrap()
     };
 
     // Broadcast participant-joined to all other clients
     {
-        let clients = state.connected_clients.lock().await;
+        let senders = state.repository.get_all_client_senders().await;
         let joined_msg = ParticipantJoinedMessage {
             r#type: MessageType::ParticipantJoined,
             client_id: client_id.clone(),
@@ -112,10 +120,10 @@ async fn handle_socket(
         };
 
         let joined_json = serde_json::to_string(&joined_msg).unwrap();
-        for (id, client_info) in clients.iter() {
+        for (id, sender) in senders.iter() {
             if id != &client_id {
                 // Send to other clients only
-                if client_info.sender.send(joined_json.clone()).is_err() {
+                if sender.send(joined_json.clone()).is_err() {
                     tracing::warn!("Failed to send participant-joined to client '{}'", id);
                 }
             }
@@ -183,13 +191,11 @@ async fn handle_socket(
                             match send_usecase.execute(client_id_vo, content_vo).await {
                                 Ok(broadcast_targets) => {
                                     // Send to broadcast targets
-                                    let clients = state_clone.connected_clients.lock().await;
+                                    let senders =
+                                        state_clone.repository.get_all_client_senders().await;
                                     for target_id in broadcast_targets {
-                                        if let Some(client_info) = clients.get(&target_id)
-                                            && client_info
-                                                .sender
-                                                .send(response_json.clone())
-                                                .is_err()
+                                        if let Some(sender) = senders.get(&target_id)
+                                            && sender.send(response_json.clone()).is_err()
                                         {
                                             tracing::warn!(
                                                 "Failed to send message to client '{}'",
@@ -274,10 +280,10 @@ async fn handle_socket(
             };
 
             let left_json = serde_json::to_string(&left_msg).unwrap();
-            let clients = state.connected_clients.lock().await;
+            let senders = state.repository.get_all_client_senders().await;
             for target_id in notify_targets {
-                if let Some(client_info) = clients.get(&target_id)
-                    && client_info.sender.send(left_json.clone()).is_err()
+                if let Some(sender) = senders.get(&target_id)
+                    && sender.send(left_json.clone()).is_err()
                 {
                     tracing::warn!("Failed to send participant-left to client '{}'", target_id);
                 }

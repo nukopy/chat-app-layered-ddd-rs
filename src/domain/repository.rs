@@ -56,4 +56,25 @@ pub trait RoomRepository: Send + Sync {
 
     /// Room の参加者リストを取得
     async fn get_participants(&self) -> Vec<Participant>;
+
+    /// クライアントのメッセージ送信チャンネルを取得
+    ///
+    /// ## 技術的負債
+    ///
+    /// `UnboundedSender<String>` はインフラ層の実装詳細です。
+    /// 将来的には MessageBroker を導入して通信を分離する必要があります。
+    async fn get_client_sender(&self, client_id: &str) -> Option<UnboundedSender<String>>;
+
+    /// 全てのクライアントのメッセージ送信チャンネルを取得
+    ///
+    /// ## 技術的負債
+    ///
+    /// `UnboundedSender<String>` はインフラ層の実装詳細です。
+    /// 将来的には MessageBroker を導入して通信を分離する必要があります。
+    async fn get_all_client_senders(
+        &self,
+    ) -> std::collections::HashMap<String, UnboundedSender<String>>;
+
+    /// クライアントの接続時刻を取得
+    async fn get_client_connected_at(&self, client_id: &str) -> Option<i64>;
 }

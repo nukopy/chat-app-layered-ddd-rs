@@ -38,10 +38,7 @@ pub async fn run(host: String, port: u16) -> Result<(), Box<dyn std::error::Erro
         ),
     );
 
-    let app_state = Arc::new(AppState {
-        repository,
-        connected_clients,
-    });
+    let app_state = Arc::new(AppState { repository });
 
     // Define handlers
     let app = Router::new()

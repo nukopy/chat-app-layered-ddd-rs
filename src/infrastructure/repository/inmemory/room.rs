@@ -134,6 +134,26 @@ impl RoomRepository for InMemoryRoomRepository {
         let room = self.room.lock().await;
         room.participants.clone()
     }
+
+    async fn get_client_sender(&self, client_id: &str) -> Option<UnboundedSender<String>> {
+        let clients = self.connected_clients.lock().await;
+        clients.get(client_id).map(|info| info.sender.clone())
+    }
+
+    async fn get_all_client_senders(
+        &self,
+    ) -> std::collections::HashMap<String, UnboundedSender<String>> {
+        let clients = self.connected_clients.lock().await;
+        clients
+            .iter()
+            .map(|(id, info)| (id.clone(), info.sender.clone()))
+            .collect()
+    }
+
+    async fn get_client_connected_at(&self, client_id: &str) -> Option<i64> {
+        let clients = self.connected_clients.lock().await;
+        clients.get(client_id).map(|info| info.connected_at)
+    }
 }
 
 #[cfg(test)]
