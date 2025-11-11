@@ -50,6 +50,11 @@ struct TestClient {
 impl TestClient {
     /// Start a test client with the given URL and client_id
     fn start(url: &str, client_id: &str) -> Self {
+        Self::start_with_delay(url, client_id, Duration::from_millis(300))
+    }
+
+    /// Start a test client with custom delay
+    fn start_with_delay(url: &str, client_id: &str, delay: Duration) -> Self {
         let mut process = Command::new("cargo")
             .args([
                 "run",
@@ -70,8 +75,10 @@ impl TestClient {
         // Take stdin for sending messages
         let stdin = process.stdin.take();
 
-        // Give client time to connect
-        thread::sleep(Duration::from_millis(300));
+        // Give client time to connect if requested
+        if !delay.is_zero() {
+            thread::sleep(delay);
+        }
 
         TestClient { process, stdin }
     }
@@ -88,6 +95,39 @@ impl TestClient {
     /// Check if the client process is still running (not crashed)
     fn is_running(&mut self) -> bool {
         matches!(self.process.try_wait(), Ok(None))
+    }
+
+    /// Wait for the client process to exit with timeout
+    /// Returns Ok(ExitStatus) if process exits within timeout, Err otherwise
+    fn wait_for_exit(&mut self, timeout: Duration) -> Result<std::process::ExitStatus, String> {
+        use std::io::Read;
+
+        let start = std::time::Instant::now();
+        loop {
+            // Check if process has exited
+            if let Ok(Some(status)) = self.process.try_wait() {
+                return Ok(status);
+            }
+            // Check timeout
+            if start.elapsed() > timeout {
+                // Try to read stderr for debugging
+                let mut stderr_output = String::new();
+                if let Some(ref mut stderr) = self.process.stderr {
+                    let _ = stderr.read_to_string(&mut stderr_output);
+                }
+                return Err(format!(
+                    "Timeout waiting for process to exit after {:?}. Stderr: {}",
+                    timeout,
+                    if stderr_output.is_empty() {
+                        "(empty)"
+                    } else {
+                        &stderr_output
+                    }
+                ));
+            }
+            // Sleep briefly before checking again
+            thread::sleep(Duration::from_millis(50));
+        }
     }
 }
 
@@ -139,17 +179,21 @@ fn test_duplicate_client_id_is_rejected() {
     let _client1 = TestClient::start(&server.url(), "alice");
 
     // when (操作):
-    // Try to connect second client with same ID
+    // Try to connect second client with same ID (don't wait for connection)
     let mut client2 = TestClient::start(&server.url(), "alice");
 
-    // Give time for rejection
-    thread::sleep(Duration::from_millis(500));
-
     // then (期待する結果):
-    // Second client should have exited (due to duplicate ID error)
+    // Second client should exit due to duplicate ID error
+    let exit_result = client2.wait_for_exit(Duration::from_secs(3));
     assert!(
-        !client2.is_running(),
-        "Second client with duplicate ID should have exited"
+        exit_result.is_ok(),
+        "Second client should have exited within timeout"
+    );
+    let exit_status = exit_result.unwrap();
+    assert!(
+        !exit_status.success(),
+        "Second client should have exited with error code (got: {:?})",
+        exit_status
     );
 }
 
