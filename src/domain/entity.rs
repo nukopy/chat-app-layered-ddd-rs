@@ -144,12 +144,13 @@ impl ChatMessage {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::domain::factory::RoomIdFactory;
 
     #[test]
     fn test_room_new() {
         // テスト項目: 新しい Room が空の状態で作成される
         // given (前提条件):
-        let room_id = RoomId::new("default".to_string()).unwrap();
+        let room_id = RoomIdFactory::generate().unwrap();
         let created_at = Timestamp::new(1000);
 
         // when (操作):
@@ -166,10 +167,7 @@ mod tests {
     fn test_room_add_participant() {
         // テスト項目: 参加者を追加できる
         // given (前提条件):
-        let mut room = Room::new(
-            RoomId::new("default".to_string()).unwrap(),
-            Timestamp::new(0),
-        );
+        let mut room = Room::new(RoomIdFactory::generate().unwrap(), Timestamp::new(0));
         let participant = Participant::new(
             ClientId::new("alice".to_string()).unwrap(),
             Timestamp::new(1000),
@@ -191,10 +189,7 @@ mod tests {
     fn test_room_remove_participant() {
         // テスト項目: 参加者を削除できる
         // given (前提条件):
-        let mut room = Room::new(
-            RoomId::new("default".to_string()).unwrap(),
-            Timestamp::new(0),
-        );
+        let mut room = Room::new(RoomIdFactory::generate().unwrap(), Timestamp::new(0));
         room.add_participant(Participant::new(
             ClientId::new("alice".to_string()).unwrap(),
             Timestamp::new(1000),
@@ -222,10 +217,7 @@ mod tests {
     fn test_room_add_message() {
         // テスト項目: メッセージを追加できる
         // given (前提条件):
-        let mut room = Room::new(
-            RoomId::new("default".to_string()).unwrap(),
-            Timestamp::new(0),
-        );
+        let mut room = Room::new(RoomIdFactory::generate().unwrap(), Timestamp::new(0));
         let message = ChatMessage::new(
             ClientId::new("alice".to_string()).unwrap(),
             MessageContent::new("Hello!".to_string()).unwrap(),
@@ -252,10 +244,7 @@ mod tests {
     fn test_room_get_participant() {
         // テスト項目: ID で参加者を取得できる
         // given (前提条件):
-        let mut room = Room::new(
-            RoomId::new("default".to_string()).unwrap(),
-            Timestamp::new(0),
-        );
+        let mut room = Room::new(RoomIdFactory::generate().unwrap(), Timestamp::new(0));
         let alice_id = ClientId::new("alice".to_string()).unwrap();
         room.add_participant(Participant::new(alice_id.clone(), Timestamp::new(1000)))
             .unwrap();
@@ -272,10 +261,7 @@ mod tests {
     fn test_room_get_nonexistent_participant() {
         // テスト項目: 存在しない参加者は None が返される
         // given (前提条件):
-        let room = Room::new(
-            RoomId::new("default".to_string()).unwrap(),
-            Timestamp::new(0),
-        );
+        let room = Room::new(RoomIdFactory::generate().unwrap(), Timestamp::new(0));
 
         // when (操作):
         let alice_id = ClientId::new("alice".to_string()).unwrap();
@@ -290,7 +276,7 @@ mod tests {
         // テスト項目: 参加者数が上限に達したらエラーが返される
         // given (前提条件):
         let mut room = Room::with_capacity(
-            RoomId::new("default".to_string()).unwrap(),
+            RoomIdFactory::generate().unwrap(),
             Timestamp::new(0),
             2, // participant_capacity
             100,
@@ -330,7 +316,7 @@ mod tests {
         // テスト項目: メッセージ数が上限に達したらエラーが返される
         // given (前提条件):
         let mut room = Room::with_capacity(
-            RoomId::new("default".to_string()).unwrap(),
+            RoomIdFactory::generate().unwrap(),
             Timestamp::new(0),
             10,
             2, // message_capacity
@@ -372,10 +358,7 @@ mod tests {
     fn test_room_default_capacities() {
         // テスト項目: デフォルトの上限値が正しく設定される
         // given (前提条件):
-        let room = Room::new(
-            RoomId::new("default".to_string()).unwrap(),
-            Timestamp::new(0),
-        );
+        let room = Room::new(RoomIdFactory::generate().unwrap(), Timestamp::new(0));
 
         // then (期待する結果):
         assert_eq!(room.participant_capacity, DEFAULT_PARTICIPANT_CAPACITY);

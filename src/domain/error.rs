@@ -17,9 +17,9 @@ pub enum ValueObjectError {
     #[error("RoomId cannot be empty")]
     RoomIdEmpty,
 
-    /// RoomId too long error
-    #[error("RoomId cannot exceed {max} characters (got {actual})")]
-    RoomIdTooLong { max: usize, actual: usize },
+    /// RoomId invalid format error (not a valid UUID format)
+    #[error("RoomId must be a valid UUID format (got: {0})")]
+    RoomIdInvalidFormat(String),
 
     /// MessageContent validation error
     #[error("MessageContent cannot be empty")]

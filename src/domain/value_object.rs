@@ -58,31 +58,49 @@ impl fmt::Display for ClientId {
 /// Room identifier value object.
 ///
 /// Represents a unique identifier for a chat room.
+/// Room IDs must be valid UUID format strings.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct RoomId(String);
 
 impl RoomId {
-    /// Create a new RoomId.
+    /// Create a new RoomId from a UUID string.
     ///
     /// # Arguments
     ///
-    /// * `id` - The room identifier string
+    /// * `id` - The room identifier string (must be a valid UUID format)
     ///
     /// # Returns
     ///
     /// A Result containing the RoomId or an error if validation fails
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - The string is empty
+    /// - The string is not a valid UUID format
     pub fn new(id: String) -> Result<Self, ValueObjectError> {
         if id.is_empty() {
             return Err(ValueObjectError::RoomIdEmpty);
         }
-        let len = id.len();
-        if len > 100 {
-            return Err(ValueObjectError::RoomIdTooLong {
-                max: 100,
-                actual: len,
-            });
-        }
+
+        // Validate UUID format
+        uuid::Uuid::parse_str(&id)
+            .map_err(|_| ValueObjectError::RoomIdInvalidFormat(id.clone()))?;
+
         Ok(Self(id))
+    }
+
+    /// Create a RoomId from a Uuid.
+    ///
+    /// # Arguments
+    ///
+    /// * `uuid` - The UUID to convert to RoomId
+    ///
+    /// # Returns
+    ///
+    /// A Result containing the RoomId
+    pub fn from_uuid(uuid: uuid::Uuid) -> Result<Self, ValueObjectError> {
+        Ok(Self(uuid.to_string()))
     }
 
     /// Get the inner string value.
@@ -248,16 +266,16 @@ mod tests {
 
     #[test]
     fn test_room_id_new_success() {
-        // テスト項目: 有効なルーム ID を作成できる
+        // テスト項目: 有効な UUID v4 形式のルーム ID を作成できる
         // given (前提条件):
-        let id = "default".to_string();
+        let id = "550e8400-e29b-41d4-a716-446655440000".to_string();
 
         // when (操作):
-        let result = RoomId::new(id);
+        let result = RoomId::new(id.clone());
 
         // then (期待する結果):
         assert!(result.is_ok());
-        assert_eq!(result.unwrap().as_str(), "default");
+        assert_eq!(result.unwrap().as_str(), id);
     }
 
     #[test]
@@ -272,6 +290,38 @@ mod tests {
         // then (期待する結果):
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), ValueObjectError::RoomIdEmpty);
+    }
+
+    #[test]
+    fn test_room_id_new_invalid_format_fails() {
+        // テスト項目: UUID v4 形式でないルーム ID は作成できない
+        // given (前提条件):
+        let id = "not-a-valid-uuid".to_string();
+
+        // when (操作):
+        let result = RoomId::new(id.clone());
+
+        // then (期待する結果):
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err(),
+            ValueObjectError::RoomIdInvalidFormat(id)
+        );
+    }
+
+    #[test]
+    fn test_room_id_from_uuid() {
+        // テスト項目: from_uuid() で UUID から RoomId を作成できる
+        // given (前提条件):
+        let uuid = uuid::Uuid::new_v4();
+
+        // when (操作):
+        let result = RoomId::from_uuid(uuid);
+
+        // then (期待する結果):
+        assert!(result.is_ok());
+        let room_id = result.unwrap();
+        assert_eq!(room_id.as_str(), uuid.to_string());
     }
 
     #[test]

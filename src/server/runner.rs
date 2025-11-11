@@ -6,7 +6,7 @@ use axum::{Router, routing::get};
 use tokio::sync::Mutex;
 
 use crate::{
-    domain::{Room, RoomId, Timestamp},
+    domain::{Room, RoomIdFactory, Timestamp},
     time::get_jst_timestamp,
 };
 
@@ -26,14 +26,16 @@ pub async fn run_server(host: String, port: u16) -> Result<(), Box<dyn std::erro
     // Create shared state for client management
     let connected_clients = Mutex::new(HashMap::new());
     let room = Mutex::new(Room::new(
-        RoomId::new("default".to_string()).expect("Failed to create RoomId"),
+        RoomIdFactory::generate().expect("Failed to generate RoomId"),
         Timestamp::new(get_jst_timestamp()),
     ));
+    tracing::info!("Room {} created!", room.lock().await.id.as_str());
     let app_state = Arc::new(AppState {
         connected_clients,
         room,
     });
 
+    // Define handlers
     let app = Router::new()
         // WebSocket エンドポイント
         .route("/ws", get(websocket_handler))
@@ -44,9 +46,11 @@ pub async fn run_server(host: String, port: u16) -> Result<(), Box<dyn std::erro
         .route("/api/rooms/{room_id}", get(get_room_detail))
         .with_state(app_state);
 
+    // Bind the server to the host and port
     let bind_addr = format!("{}:{}", host, port);
     let listener = tokio::net::TcpListener::bind(&bind_addr).await?;
 
+    // Start the server
     tracing::info!(
         "WebSocket chat server listening on {}",
         listener.local_addr()?
