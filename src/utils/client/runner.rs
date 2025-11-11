@@ -8,7 +8,7 @@ const MAX_RECONNECT_ATTEMPTS: u32 = 5;
 const RECONNECT_INTERVAL_SECS: u64 = 5;
 
 /// Run the WebSocket client with reconnection logic
-pub async fn run_client(url: String, client_id: String) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn run(url: String, client_id: String) -> Result<(), Box<dyn std::error::Error>> {
     let mut reconnect_count = 0;
 
     loop {

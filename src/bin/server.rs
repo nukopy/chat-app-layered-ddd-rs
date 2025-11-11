@@ -32,7 +32,7 @@ async fn main() {
     let args = Args::parse();
 
     // Run the server
-    if let Err(e) = chat_app_rs::ui::run_server(args.host, args.port).await {
+    if let Err(e) = chat_app_rs::ui::run(args.host, args.port).await {
         tracing::error!("Server error: {}", e);
         std::process::exit(1);
     }

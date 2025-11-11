@@ -22,7 +22,7 @@ use super::{
 ///
 /// * `host` - The host address to bind to (e.g., "127.0.0.1")
 /// * `port` - The port number to bind to (e.g., 8080)
-pub async fn run_server(host: String, port: u16) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn run(host: String, port: u16) -> Result<(), Box<dyn std::error::Error>> {
     // Create shared state for client management
     let connected_clients = Mutex::new(HashMap::new());
     let room = Mutex::new(Room::new(

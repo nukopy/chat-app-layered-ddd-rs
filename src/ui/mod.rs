@@ -6,4 +6,4 @@ mod runner;
 mod signal;
 mod state;
 
-pub use runner::run_server;
+pub use runner::run;

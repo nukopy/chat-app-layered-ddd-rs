@@ -36,7 +36,7 @@ async fn main() {
     let args = Args::parse();
 
     // Run the client
-    if let Err(e) = chat_app_rs::common::client::run_client(args.url, args.client_id).await {
+    if let Err(e) = chat_app_rs::utils::client::run(args.url, args.client_id).await {
         tracing::error!("Client error: {}", e);
         std::process::exit(1);
     }
