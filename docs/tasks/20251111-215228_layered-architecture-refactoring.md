@@ -80,91 +80,98 @@ Infrastructure 層（DTO, Conversion, Repository）
 
 ### Phase 1: UseCase 層の基盤作成（最優先）
 
-- [ ] `src/usecase/connect_participant.rs` を作成
-  - [ ] `ConnectParticipantUseCase` 構造体定義
-  - [ ] `execute()` メソッドのシグネチャ定義
-  - [ ] テストを書く（TDD）
-    - [ ] 作業記録：何をテストするか、なぜ必要か、どの状況を想定するかを記録
-  - [ ] 実装
-- [ ] `src/usecase/send_message.rs` を作成
-  - [ ] `SendMessageUseCase` 構造体定義
-  - [ ] `execute()` メソッドのシグネチャ定義
-  - [ ] テストを書く（TDD）
-    - [ ] 作業記録：何をテストするか、なぜ必要か、どの状況を想定するかを記録
-  - [ ] 実装
-- [ ] `src/usecase/disconnect_participant.rs` を作成
-  - [ ] `DisconnectParticipantUseCase` 構造体定義
-  - [ ] `execute()` メソッドのシグネチャ定義
-  - [ ] テストを書く（TDD）
-    - [ ] 作業記録：何をテストするか、なぜ必要か、どの状況を想定するかを記録
-  - [ ] 実装
-- [ ] `src/usecase/mod.rs` を更新
-  - [ ] 各 UseCase を re-export
+- [x] `src/usecase/connect_participant.rs` を作成
+  - [x] `ConnectParticipantUseCase` 構造体定義
+  - [x] `execute()` メソッドのシグネチャ定義
+  - [x] テストを書く（TDD）
+    - [x] 作業記録：何をテストするか、なぜ必要か、どの状況を想定するかを記録
+  - [x] 実装
+- [x] `src/usecase/send_message.rs` を作成
+  - [x] `SendMessageUseCase` 構造体定義
+  - [x] `execute()` メソッドのシグネチャ定義
+  - [x] テストを書く（TDD）
+    - [x] 作業記録：何をテストするか、なぜ必要か、どの状況を想定するかを記録
+  - [x] 実装
+- [x] `src/usecase/disconnect_participant.rs` を作成
+  - [x] `DisconnectParticipantUseCase` 構造体定義
+  - [x] `execute()` メソッドのシグネチャ定義
+  - [x] テストを書く（TDD）
+    - [x] 作業記録：何をテストするか、なぜ必要か、どの状況を想定するかを記録
+  - [x] 実装
+- [x] `src/usecase/mod.rs` を更新
+  - [x] 各 UseCase を re-export
 
 ### Phase 2: UI 層のリファクタリング
 
-- [ ] `src/ui/domain.rs` からロジックを抽出
-  - [ ] `build_participant_list()` → `connect_participant.rs` に移動
-  - [ ] `is_duplicate_client()` → `connect_participant.rs` に移動
-  - [ ] `get_broadcast_targets()` → `send_message.rs` に移動
-  - [ ] その他のヘルパー関数を適切な UseCase に移動
-- [ ] `src/ui/handler.rs` をリファクタリング
-  - [ ] `websocket_handler` から UseCase を呼び出すように変更
-  - [ ] `get_rooms` から UseCase を呼び出すように変更
-  - [ ] `get_room_detail` から UseCase を呼び出すように変更
-  - [ ] ビジネスロジックを UseCase に移動
-- [ ] `src/ui/domain.rs` を削除
-  - [ ] すべてのロジックが UseCase に移動したことを確認
-  - [ ] ファイルを削除
-  - [ ] `src/ui/mod.rs` から domain モジュールを削除
-- [ ] テストが通ることを確認（73 tests）
+- [x] `src/ui/domain.rs` からロジックを抽出
+  - [x] `build_participant_list()` → `connect_participant.rs` に移動
+  - [x] `is_duplicate_client()` → `connect_participant.rs` に移動
+  - [x] `get_broadcast_targets()` → `send_message.rs` に移動
+  - [x] その他のヘルパー関数を適切な UseCase に移動
+- [x] `src/ui/handler.rs` をリファクタリング
+  - [x] `websocket_handler` から UseCase を呼び出すように変更
+  - [x] `get_rooms` から UseCase を呼び出すように変更
+  - [x] `get_room_detail` から UseCase を呼び出すように変更
+  - [x] ビジネスロジックを UseCase に移動
+- [x] `src/ui/domain.rs` を削除
+  - [x] すべてのロジックが UseCase に移動したことを確認
+  - [x] ファイルを削除
+  - [x] `src/ui/mod.rs` から domain モジュールを削除
+- [x] テストが通ることを確認（63 tests after domain.rs deletion）
 
 ### Phase 3: Infrastructure 層の整理（インメモリ DB 実装）
 
-- [ ] Repository パターンの導入
-  - [ ] `src/infrastructure/repository/mod.rs` を作成
-  - [ ] `RoomRepository` trait を定義（データストアへのインターフェース）
-    - [ ] `get_room()` メソッド
-    - [ ] `save_room()` メソッド
-    - [ ] `add_participant()` メソッド
-    - [ ] `remove_participant()` メソッド
-    - [ ] `get_client_info()` メソッド
-  - [ ] `InMemoryRoomRepository` 実装を作成（インメモリ DB として動作）
-    - [ ] `src/ui/state.rs` のロジックを移動（`HashMap` ベース）
-    - [ ] テストを書く（作業記録を残す）
-- [ ] `src/ui/state.rs` をリファクタリング
-  - [ ] `AppState` を簡素化（Repository を保持するだけ）
-  - [ ] または `src/infrastructure/repository/room_repository.rs` に統合
-- [ ] UseCase が Repository を使うように変更
-  - [ ] `ConnectParticipantUseCase` が `RoomRepository` に依存
-  - [ ] `SendMessageUseCase` が `RoomRepository` に依存
-  - [ ] `DisconnectParticipantUseCase` が `RoomRepository` に依存
-- [ ] `src/infrastructure/mod.rs` を更新
-  - [ ] repository モジュールを re-export
-- [ ] テストが通ることを確認（73 tests）
+- [x] Repository パターンの導入
+  - [x] `src/infrastructure/repository/mod.rs` を作成
+  - [x] `RoomRepository` trait を定義（データストアへのインターフェース）
+    - [x] `get_room()` メソッド
+    - [x] `add_participant()` メソッド
+    - [x] `remove_participant()` メソッド
+    - [x] `get_client_info()` メソッド
+    - [x] `get_all_connected_client_ids()` メソッド
+    - [x] `add_message()` メソッド
+    - [x] `count_connected_clients()` メソッド
+    - [x] `get_participants()` メソッド
+  - [x] `InMemoryRoomRepository` 実装を作成（インメモリ DB として動作）
+    - [x] `HashMap` ベースのインメモリストレージ
+    - [x] テストを書く（作業記録を残す）- 7 tests
+- [x] `src/ui/state.rs` をリファクタリング
+  - [x] `AppState` が Repository を保持（WebSocket broadcasting 用に connected_clients も共有）
+- [x] UseCase が Repository を使うように変更
+  - [x] `ConnectParticipantUseCase` が `RoomRepository` に依存
+  - [x] `SendMessageUseCase` が `RoomRepository` に依存
+  - [x] `DisconnectParticipantUseCase` が `RoomRepository` に依存
+- [x] `src/infrastructure/mod.rs` を更新
+  - [x] repository モジュールを re-export
+- [x] テストが通ることを確認（70 tests - 7 repository tests added）
 
 ### Phase 4: 最終調整とドキュメント
 
-- [ ] cargo fmt 実行
-- [ ] cargo clippy 実行
-- [ ] cargo test 実行（73 tests）
-- [ ] `docs/documentations/software-architecture.md` を更新
-  - [ ] 新しいレイヤー構造を反映
-  - [ ] UseCase 層の説明を追加
-  - [ ] Repository パターン（インメモリ DB）の説明を追加
-- [ ] AGENTS.md を更新（必要に応じて）
-- [ ] タスクドキュメントを完了としてクローズ
+- [x] cargo fmt 実行
+- [x] cargo clippy 実行
+- [x] cargo test 実行（70 tests - all passed）
+- [x] `docs/documentations/software-architecture.md` を更新
+  - [x] 新しいレイヤー構造を反映
+  - [x] UseCase 層の説明を追加
+  - [x] Repository パターン（インメモリ DB）の説明を追加
+- [x] AGENTS.md を更新（必要に応じて）
+- [x] タスクドキュメントを完了としてクローズ
 
 ## 進捗状況
 
 - **開始日**: 2025-11-11 21:52:28
-- **完了日**: -
-- **ステータス**: 🚧 **進行中**
-- **現在のフェーズ**: Phase 1（計画段階）
-- **完了タスク数**: 0/33
-- **次のアクション**: Phase 1 の UseCase 層基盤作成
+- **完了日**: 2025-11-11 23:45:00
+- **ステータス**: ✅ **完了**
+- **現在のフェーズ**: Phase 4 完了
+- **完了タスク数**: 47/47
+- **次のアクション**: なし（タスク完了）
 - **ブロッカー**: なし
-- **作業記録**: レイヤー内・レイヤー間のテスト実装時は必ず意図を記録すること
+- **最終結果**:
+  - Repository パターン実装完了（InMemoryRoomRepository）
+  - UseCase 層完全実装（ConnectParticipant, SendMessage, DisconnectParticipant）
+  - UI 層リファクタリング完了（domain.rs 削除）
+  - すべてのテスト合格（70 tests）
+  - cargo fmt, clippy 問題なし
 
 ## 備考
 
