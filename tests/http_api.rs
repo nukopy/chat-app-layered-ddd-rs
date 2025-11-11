@@ -48,13 +48,21 @@ async fn test_rooms_list_endpoint() {
     let body: serde_json::Value = response.json().await.expect("Failed to parse JSON");
     assert!(body.is_array(), "Response should be an array");
 
-    // デフォルトでは1つのルーム（"default"）が存在する
+    // デフォルトでは1つのルームが存在する
     let rooms = body.as_array().unwrap();
     assert_eq!(rooms.len(), 1);
 
     // ルームの構造を確認
     let room = &rooms[0];
-    assert_eq!(room["id"], "default");
+    let room_id = room["id"].as_str().expect("room id should be a string");
+
+    // UUID v4 形式であることを確認（36文字、ハイフン含む）
+    assert_eq!(room_id.len(), 36, "Room ID should be UUID format (36 chars)");
+    assert!(
+        uuid::Uuid::parse_str(room_id).is_ok(),
+        "Room ID should be valid UUID"
+    );
+
     assert!(room["participants"].is_array());
     assert!(room["created_at"].is_string());
 }
@@ -67,9 +75,21 @@ async fn test_room_detail_endpoint_success() {
     let server = TestServer::start(port);
     let client = reqwest::Client::new();
 
+    // 実際の room_id を取得
+    let rooms_response = client
+        .get(format!("{}/api/rooms", server.base_url()))
+        .send()
+        .await
+        .expect("Failed to get rooms");
+    let rooms: serde_json::Value = rooms_response
+        .json()
+        .await
+        .expect("Failed to parse rooms JSON");
+    let room_id = rooms[0]["id"].as_str().expect("room id should exist");
+
     // when (操作):
     let response = client
-        .get(format!("{}/api/rooms/default", server.base_url()))
+        .get(format!("{}/api/rooms/{}", server.base_url(), room_id))
         .send()
         .await
         .expect("Failed to send request");
@@ -78,7 +98,7 @@ async fn test_room_detail_endpoint_success() {
     assert_eq!(response.status(), 200);
 
     let body: serde_json::Value = response.json().await.expect("Failed to parse JSON");
-    assert_eq!(body["id"], "default");
+    assert_eq!(body["id"], room_id);
     assert!(body["participants"].is_array());
     assert!(body["created_at"].is_string());
 
@@ -98,9 +118,16 @@ async fn test_room_detail_endpoint_not_found() {
     let server = TestServer::start(port);
     let client = reqwest::Client::new();
 
+    // 存在しない UUID を使用
+    let nonexistent_uuid = "00000000-0000-0000-0000-000000000000";
+
     // when (操作):
     let response = client
-        .get(format!("{}/api/rooms/nonexistent", server.base_url()))
+        .get(format!(
+            "{}/api/rooms/{}",
+            server.base_url(),
+            nonexistent_uuid
+        ))
         .send()
         .await
         .expect("Failed to send request");
