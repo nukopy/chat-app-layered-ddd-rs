@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - ".gitignore"
+      - "**.md"
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - ".gitignore"
+      - "**.md"
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_NET_RETRY: 10
+  RUST_VERSION: 1.90
+  RUST_BACKTRACE: short
+  RUSTFLAGS: "-D warnings"
+  RUSTUP_MAX_RETRIES: 10
+  JUST_VERSION: 1.4.0
+
+jobs:
+  set-rust-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      rust: ${{ steps.set.outputs.rust }}
+    steps:
+      - name: Decide Rust channels
+        id: set
+        run: |
+          echo "rust=[\"${{ env.RUST_VERSION }}\"]" >> $GITHUB_OUTPUT
+
+  format:
+    name: Format [Rustfmt]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Rustfmt
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          components: rustfmt
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Run format
+        run: cargo fmt
+
+  lint:
+    name: Lint [Clippy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Clippy
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Run lint
+        run: cargo clippy --all-targets --all-features
+
+  cargo_check:
+    name: Compile
+    needs: [format, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchains
+        uses: dtolnay/rust-toolchain@stable
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Run cargo check
+        run: cargo check --all-targets --all-features
+
+  test:
+    name: Test
+    needs: [set-rust-matrix, cargo_check]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        rust: ${{ fromJson(needs.set-rust-matrix.outputs.rust) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchains
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Run tests
+        run: cargo test --all-targets --all-features --verbose
