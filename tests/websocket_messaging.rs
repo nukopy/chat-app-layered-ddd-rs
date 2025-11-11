@@ -8,12 +8,12 @@ use std::time::Duration;
 mod fixtures;
 use fixtures::{TestClient, TestServer};
 
-#[test]
-fn test_message_broadcast() {
+#[tokio::test]
+async fn test_message_broadcast() {
     // テスト項目: メッセージ送受信が正常に動作する（クラッシュしない）
     // given (前提条件):
     let port = 18084;
-    let server = TestServer::start(port);
+    let server = TestServer::start(port).await;
 
     let mut client_alice = TestClient::start(&server.url(), "alice");
     thread::sleep(Duration::from_millis(200));
@@ -58,12 +58,12 @@ fn test_message_broadcast() {
     // The broadcast logic itself is verified in unit tests
 }
 
-#[test]
-fn test_participant_notifications() {
+#[tokio::test]
+async fn test_participant_notifications() {
     // テスト項目: 新規参加者の接続・切断が正常に動作する（クラッシュしない）
     // given (前提条件):
     let port = 18085;
-    let server = TestServer::start(port);
+    let server = TestServer::start(port).await;
 
     let mut client_alice = TestClient::start(&server.url(), "alice");
     thread::sleep(Duration::from_millis(300));

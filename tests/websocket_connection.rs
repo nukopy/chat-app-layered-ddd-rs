@@ -9,14 +9,14 @@ use std::time::Duration;
 mod fixtures;
 use fixtures::{TestClient, TestServer};
 
-#[test]
-fn test_server_starts_successfully() {
+#[tokio::test]
+async fn test_server_starts_successfully() {
     // テスト項目: サーバーが正常に起動する
     // given (前提条件):
     let port = 18080;
 
     // when (操作):
-    let _server = TestServer::start(port);
+    let _server = TestServer::start(port).await;
 
     // then (期待する結果):
     // Server started successfully (no panic)
@@ -24,12 +24,12 @@ fn test_server_starts_successfully() {
     // If we reach here, the server started successfully
 }
 
-#[test]
-fn test_client_connects_to_server() {
+#[tokio::test]
+async fn test_client_connects_to_server() {
     // テスト項目: クライアントがサーバーに接続できる
     // given (前提条件):
     let port = 18081;
-    let server = TestServer::start(port);
+    let server = TestServer::start(port).await;
 
     // when (操作):
     let _client = TestClient::start(&server.url(), "alice");
@@ -40,12 +40,12 @@ fn test_client_connects_to_server() {
     // If we reach here, the client connected successfully
 }
 
-#[test]
-fn test_multiple_different_clients_can_connect() {
+#[tokio::test]
+async fn test_multiple_different_clients_can_connect() {
     // テスト項目: 異なる client_id を持つ複数のクライアントが接続できる
     // given (前提条件):
     let port = 18083;
-    let server = TestServer::start(port);
+    let server = TestServer::start(port).await;
 
     // when (操作):
     let _client1 = TestClient::start(&server.url(), "alice");
@@ -62,12 +62,12 @@ fn test_multiple_different_clients_can_connect() {
     // If we reach here, all clients connected successfully
 }
 
-#[test]
-fn test_duplicate_client_id_is_rejected() {
+#[tokio::test]
+async fn test_duplicate_client_id_is_rejected() {
     // テスト項目: 重複する client_id での接続が拒否される
     // given (前提条件):
     let port = 18082;
-    let server = TestServer::start(port);
+    let server = TestServer::start(port).await;
     let _client1 = TestClient::start(&server.url(), "alice");
 
     // when (操作):

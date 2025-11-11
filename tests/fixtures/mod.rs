@@ -17,7 +17,8 @@ pub struct TestServer {
 
 impl TestServer {
     /// Start a test server on the specified port
-    pub fn start(port: u16) -> Self {
+    #[allow(clippy::zombie_processes)] // Process is properly handled in Drop and panic paths
+    pub async fn start(port: u16) -> Self {
         let process = Command::new("cargo")
             .args(["run", "--bin", "server", "--", "--port", &port.to_string()])
             .stdout(Stdio::piped())
@@ -25,10 +26,36 @@ impl TestServer {
             .spawn()
             .expect("Failed to start server");
 
-        // Give server time to start
-        thread::sleep(Duration::from_millis(1000));
+        // Wait for server to be ready by polling health endpoint
+        let health_url = format!("http://127.0.0.1:{}/api/health", port);
+        let max_retries = 30; // 30 * 100ms = 3 seconds max
 
-        TestServer { process, port }
+        for attempt in 1..=max_retries {
+            tokio::time::sleep(Duration::from_millis(100)).await;
+
+            if let Ok(response) = reqwest::get(&health_url).await
+                && response.status().is_success()
+            {
+                // Server is ready
+                return TestServer { process, port };
+            }
+
+            // On last attempt, provide helpful error message
+            if attempt == max_retries {
+                // Kill the process before panicking to avoid zombie process
+                let mut process = process;
+                let _ = process.kill();
+                let _ = process.wait();
+                panic!(
+                    "Server failed to start within {} seconds. \
+                     Health endpoint {} did not respond successfully.",
+                    max_retries as f64 / 10.0,
+                    health_url
+                );
+            }
+        }
+
+        unreachable!()
     }
 
     /// Get the WebSocket URL for this server

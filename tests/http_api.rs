@@ -10,7 +10,7 @@ async fn test_health_endpoint() {
     // テスト項目: /api/health エンドポイントが正常に動作する
     // given (前提条件):
     let port = 19080;
-    let server = TestServer::start(port);
+    let server = TestServer::start(port).await;
     let client = reqwest::Client::new();
 
     // when (操作):
@@ -32,7 +32,7 @@ async fn test_rooms_list_endpoint() {
     // テスト項目: /api/rooms エンドポイントがルーム一覧を返す
     // given (前提条件):
     let port = 19081;
-    let server = TestServer::start(port);
+    let server = TestServer::start(port).await;
     let client = reqwest::Client::new();
 
     // when (操作):
@@ -76,7 +76,7 @@ async fn test_room_detail_endpoint_success() {
     // テスト項目: /api/rooms/:room_id エンドポイントが正常にルーム詳細を返す
     // given (前提条件):
     let port = 19082;
-    let server = TestServer::start(port);
+    let server = TestServer::start(port).await;
     let client = reqwest::Client::new();
 
     // 実際の room_id を取得
@@ -119,7 +119,7 @@ async fn test_room_detail_endpoint_not_found() {
     // テスト項目: /api/rooms/:room_id エンドポイントが存在しないルームに対して404を返す
     // given (前提条件):
     let port = 19083;
-    let server = TestServer::start(port);
+    let server = TestServer::start(port).await;
     let client = reqwest::Client::new();
 
     // 存在しない UUID を使用
