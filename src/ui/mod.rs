@@ -1,9 +1,8 @@
 //! WebSocket chat server implementation.
 
-mod domain;
 mod handler;
 mod runner;
 mod signal;
-mod state;
+pub mod state; // UseCase 層からアクセスするため public に変更
 
 pub use runner::run;

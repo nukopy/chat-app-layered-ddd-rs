@@ -23,16 +23,24 @@ use super::{
 /// * `host` - The host address to bind to (e.g., "127.0.0.1")
 /// * `port` - The port number to bind to (e.g., 8080)
 pub async fn run(host: String, port: u16) -> Result<(), Box<dyn std::error::Error>> {
-    // Create shared state for client management
-    let connected_clients = Mutex::new(HashMap::new());
-    let room = Mutex::new(Room::new(
+    // Create Repository (in-memory database)
+    let connected_clients = Arc::new(Mutex::new(HashMap::new()));
+    let room = Arc::new(Mutex::new(Room::new(
         RoomIdFactory::generate().expect("Failed to generate RoomId"),
         Timestamp::new(get_jst_timestamp()),
-    ));
+    )));
     tracing::info!("Room {} created!", room.lock().await.id.as_str());
+
+    let repository = Arc::new(
+        crate::infrastructure::repository::InMemoryRoomRepository::new(
+            connected_clients.clone(),
+            room,
+        ),
+    );
+
     let app_state = Arc::new(AppState {
+        repository,
         connected_clients,
-        room,
     });
 
     // Define handlers

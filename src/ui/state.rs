@@ -1,10 +1,10 @@
 //! Server state and connection management.
 
 use serde::Deserialize;
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 use tokio::sync::{Mutex, mpsc};
 
-use crate::domain::Room;
+use crate::domain::RoomRepository;
 
 /// Query parameters for WebSocket connection
 #[derive(Debug, Deserialize)]
@@ -22,8 +22,8 @@ pub struct ClientInfo {
 
 /// Shared application state
 pub struct AppState {
-    /// Map of client_id to their connection info
-    pub connected_clients: Mutex<HashMap<String, ClientInfo>>,
-    /// Domain model: chat room with participants and message history
-    pub room: Mutex<Room>,
+    /// Repository（データアクセス層の抽象化）
+    pub repository: Arc<dyn RoomRepository>,
+    /// WebSocket sender channels for broadcasting (shared with Repository)
+    pub connected_clients: Arc<Mutex<HashMap<String, ClientInfo>>>,
 }
