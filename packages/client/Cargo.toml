@@ -25,8 +25,8 @@ futures-util = { workspace = true }
 rustyline = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-engawa-server = { version = "0.0.1", path = "../server" }
-engawa-shared = { version = "0.0.1", path = "../shared" }
+engawa-server = { version = "0.0.2", path = "../server" }
+engawa-shared = { version = "0.0.2", path = "../shared" }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tokio-tungstenite = { workspace = true }
