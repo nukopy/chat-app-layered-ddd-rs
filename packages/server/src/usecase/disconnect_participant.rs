@@ -115,12 +115,12 @@ impl DisconnectParticipantUseCase {
 mod tests {
     use super::*;
     use crate::{
-        common::time::get_jst_timestamp,
         domain::{Room, RoomIdFactory, Timestamp},
         infrastructure::{
             message_pusher::WebSocketMessagePusher, repository::InMemoryRoomRepository,
         },
     };
+    use shared::time::get_jst_timestamp;
     use std::{collections::HashMap, sync::Arc};
     use tokio::sync::Mutex;
 

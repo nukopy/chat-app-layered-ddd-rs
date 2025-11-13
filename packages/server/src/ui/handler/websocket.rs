@@ -14,7 +14,6 @@ use futures_util::{sink::SinkExt, stream::StreamExt};
 use tokio::sync::mpsc;
 
 use crate::{
-    common::time::get_jst_timestamp,
     domain::{ClientId, MessageContent, Timestamp},
     infrastructure::dto::websocket::{
         ChatMessage, MessageType, ParticipantJoinedMessage, ParticipantLeftMessage,
@@ -22,6 +21,7 @@ use crate::{
     },
     ui::state::AppState,
 };
+use shared::time::get_jst_timestamp;
 
 use serde::Deserialize;
 

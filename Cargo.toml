@@ -1,17 +1,16 @@
-[package]
-name = "chat-app-rs"
-version = "0.1.0"
+[workspace]
+resolver = "2"
+members = [
+    "packages/shared",
+    "packages/server",
+    "packages/client",
+]
+
+[workspace.package]
 edition = "2024"
+version = "0.1.0"
 
-[[bin]]
-name = "server"
-path = "src/bin/server.rs"
-
-[[bin]]
-name = "client"
-path = "src/bin/client.rs"
-
-[dependencies]
+[workspace.dependencies]
 async-trait = "0.1.89"
 axum = { version = "0.8.6", features = ["macros", "ws"] }
 chrono = "0.4"

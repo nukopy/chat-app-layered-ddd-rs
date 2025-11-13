@@ -20,7 +20,7 @@ impl TestServer {
     #[allow(clippy::zombie_processes)] // Process is properly handled in Drop and panic paths
     pub async fn start(port: u16) -> Self {
         let process = Command::new("cargo")
-            .args(["run", "--bin", "server", "--", "--port", &port.to_string()])
+            .args(["run", "-p", "server", "--bin", "server", "--", "--port", &port.to_string()])
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .spawn()
@@ -94,6 +94,8 @@ impl TestClient {
         let mut process = Command::new("cargo")
             .args([
                 "run",
+                "-p",
+                "client",
                 "--bin",
                 "client",
                 "--",

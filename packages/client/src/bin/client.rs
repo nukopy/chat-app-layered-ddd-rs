@@ -12,8 +12,7 @@
 //! ```
 
 use clap::Parser;
-
-use chat_app_rs::common::logger::setup_logger;
+use shared::logger::setup_logger;
 
 #[derive(Parser, Debug)]
 #[command(name = "client")]
@@ -36,7 +35,7 @@ async fn main() {
     let args = Args::parse();
 
     // Run the client
-    if let Err(e) = chat_app_rs::utils::client::run(args.url, args.client_id).await {
+    if let Err(e) = client::run(args.url, args.client_id).await {
         tracing::error!("Client error: {}", e);
         std::process::exit(1);
     }

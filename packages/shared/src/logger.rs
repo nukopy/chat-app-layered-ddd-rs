@@ -15,7 +15,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 /// # Examples
 ///
 /// ```no_run
-/// use chat_app_rs::common::logger::setup_logger;
+/// use shared::logger::setup_logger;
 ///
 /// setup_logger("server", "debug");
 /// ```

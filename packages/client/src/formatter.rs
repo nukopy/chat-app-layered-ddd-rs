@@ -2,9 +2,8 @@
 
 #![allow(dead_code)]
 
-use crate::{
-    common::time::timestamp_to_jst_rfc3339, infrastructure::dto::websocket::ParticipantInfo,
-};
+use server::infrastructure::dto::websocket::ParticipantInfo;
+use shared::time::timestamp_to_jst_rfc3339;
 
 /// Message formatter for client display
 pub struct MessageFormatter;

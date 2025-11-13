@@ -10,8 +10,8 @@
 
 use std::{collections::HashMap, sync::Arc};
 
-use chat_app_rs::{
-    common::{logger::setup_logger, time::get_jst_timestamp},
+use clap::Parser;
+use server::{
     domain::{Room, RoomIdFactory, Timestamp},
     infrastructure::{message_pusher::WebSocketMessagePusher, repository::InMemoryRoomRepository},
     ui::Server,
@@ -20,7 +20,7 @@ use chat_app_rs::{
         GetRoomStateUseCase, GetRoomsUseCase, SendMessageUseCase,
     },
 };
-use clap::Parser;
+use shared::{logger::setup_logger, time::get_jst_timestamp};
 use tokio::sync::Mutex;
 
 #[derive(Parser, Debug)]

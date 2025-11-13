@@ -99,7 +99,8 @@ impl RoomRepository for InMemoryRoomRepository {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{common::time::get_jst_timestamp, domain::RoomIdFactory};
+    use crate::domain::RoomIdFactory;
+    use shared::time::get_jst_timestamp;
 
     // ========================================
     // テスト作業記録

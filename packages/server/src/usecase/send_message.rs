@@ -60,7 +60,7 @@ impl SendMessageUseCase {
         content: MessageContent,
         json_message: String,
     ) -> Result<Vec<ClientId>, SendMessageError> {
-        use crate::common::time::get_jst_timestamp;
+        use shared::time::get_jst_timestamp;
 
         let timestamp = Timestamp::new(get_jst_timestamp());
 
@@ -98,10 +98,10 @@ impl SendMessageUseCase {
 mod tests {
     use super::*;
     use crate::{
-        common::time::get_jst_timestamp,
         domain::{MessagePushError, MessagePusher, PusherChannel, Room, RoomIdFactory, Timestamp},
         infrastructure::repository::InMemoryRoomRepository,
     };
+    use shared::time::get_jst_timestamp;
     use std::sync::Arc;
     use tokio::sync::Mutex;
 
