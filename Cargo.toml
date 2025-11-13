@@ -14,8 +14,8 @@ authors = ["nukopy <nukopy@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/nukopy/engawa"
 documentation = "https://github.com/nukopy/engawa/blob/main/README.md"
-categories = ["network", "chat", "websocket"]
-keywords = ["chat", "server", "client", "axum", "websocket"]
+categories = ["command-line-interface", "web-programming", "web-programming::http-client", "web-programming::http-server", "web-programming::websocket"]
+keywords = ["chat", "axum", "websocket", "layered architecture", "ddd"]
 
 [workspace.dependencies]
 async-trait = "0.1.89"
