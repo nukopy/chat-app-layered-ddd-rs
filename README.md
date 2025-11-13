@@ -48,6 +48,7 @@ graph TD
 
 - **リアルタイムチャット**:
   - クライアント間でメッセージを送受信（送信者自身には送信されない）
+  - メッセージは送信者以外の全クライアントにブロードキャスト
 - **参加者管理**:
   - 接続時に現在の参加者一覧を表示（`room-connected`）
   - 新規参加者の入室通知（`participant-joined`）
@@ -56,7 +57,8 @@ graph TD
 - **接続管理**:
   - ユニークな `client_id` による識別
   - 重複 `client_id` の接続拒否（HTTP 409 Conflict）
-  - 自動再接続機能（5秒間隔、最大5回）
+  - 自動再接続機能（5秒間隔、最大 5 回）
+    - TODO: exponential backoff にする
 - **サーバ機能**:
   - グレースフルシャットダウン（Ctrl+C / SIGTERM）
   - クライアント接続状態の管理
@@ -120,9 +122,9 @@ cargo build -p client
 cargo build -p shared
 ```
 
-## 実行
+### 実行
 
-### サーバの起動
+#### サーバの起動
 
 ```sh
 cargo run -p server --bin server
@@ -137,7 +139,7 @@ help
 cargo run -p server --bin server -- --help
 ```
 
-### クライアントの起動
+#### クライアントの起動
 
 ```sh
 cargo run -p client --bin client -- --client-id alice
@@ -154,14 +156,6 @@ help
 ```sh
 cargo run -p client --bin client -- --help
 ```
-
-### 特徴
-
-- 各クライアントはユニークな `client_id` で識別されます
-- 同じ `client_id` での重複接続は拒否されます（HTTP 409 Conflict）
-- メッセージは送信者以外の全クライアントにブロードキャストされます
-- サーバは Ctrl+C でグレースフルシャットダウンします
-- クライアントは接続断時に自動再接続を試みます（5秒間隔、最大5回）
 
 ## Note
 
