@@ -9,6 +9,9 @@ repository.workspace = true
 documentation.workspace = true
 categories.workspace = true
 keywords.workspace = true
+description = """
+Shared utilities for Engawa
+"""
 publish = true
 
 [dependencies]

@@ -9,6 +9,9 @@ repository.workspace = true
 documentation.workspace = true
 categories.workspace = true
 keywords = ["chat", "client", "cli", "axum", "websocket"]
+description = """
+CLI chat client for Engawa, chat application built with Axum and WebSocket.
+"""
 publish = true
 
 [[bin]]
