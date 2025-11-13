@@ -10,6 +10,12 @@ members = [
 version = "0.0.1"
 edition = "2024"
 rust-version = "1.90.0"
+authors = ["nukopy <nukopy@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/nukopy/engawa"
+documentation = "https://github.com/nukopy/engawa/blob/main/README.md"
+categories = ["network", "chat", "websocket"]
+keywords = ["axum", "websocket", "chat", "engawa", "layered architecture", "ddd"]
 
 [workspace.dependencies]
 async-trait = "0.1.89"
