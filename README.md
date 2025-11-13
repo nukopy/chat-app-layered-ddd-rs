@@ -1,11 +1,17 @@
-# Engawa 縁側
+# Engawa
 
+[![Crates.io version badge][crates-badge]][crates-url]
+[![MIT license badge][mit-badge]][mit-url]
 [![GitHub Actions workflow badge - CI][github-actions-badge-ci]][github-actions-url-ci]
 
-[github-actions-badge-ci]: https://github.com/nukopy/chat-app-rs/actions/workflows/ci.yml/badge.svg?branch=main
-[github-actions-url-ci]: https://github.com/nukopy/chat-app-rs/actions/workflows/ci.yml?query=branch:main
+[crates-badge]: https://img.shields.io/crates/v/engawa-server.svg
+[crates-url]: https://crates.io/crates/engawa-server
+[mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[mit-url]: https://github.com/nukopy/engawa/blob/main/LICENSE
+[github-actions-badge-ci]: https://github.com/nukopy/engawa/actions/workflows/ci.yml/badge.svg?branch=main
+[github-actions-url-ci]: https://github.com/nukopy/engawa/actions/workflows/ci.yml?query=branch:main
 
-Layered Architecture / DDD を採用した、Rust + Axum + WebSocket のチャットアプリ
+Layered Architecture / DDD を採用した、Rust + Axum + WebSocket のチャットアプリ Engawa ("縁側" in Japanese)
 
 ## プロジェクト構成
 
